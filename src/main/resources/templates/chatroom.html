@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeminiAI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <!--
+
+    you request for a chat bot responce 
+    attach: token 
+
+    -> server  can access username and other datas from the token 
+
+    -> then you send the responce user based on that .
+    
+    -->
+<div class="container mt-4">
+    <div class="row gx-3">
+        <!-- Sidebar⚙️ -->
+        <div class="expand-tab" onclick="toggleSidebar()">&#9664;</div>
+        <div class="col-12 col-md-3 mb-3" id="sidebarWrapper">
+            <button class="btn btn-primary new-chat-btn w-100 mb-3" onclick="startNewChat()">New Chat</button>
+            <h5 class="text-white">Chat History</h5>
+            <div class="sidebar" id="chatHistory">
+                <p class="text-secondary">No chat history yet.</p>
+
+            </div>
+        </div>
+
+        <!-- Main Chat Area -->
+        <div class="col-12 col-md-9">
+            <h2 class="text-center text-md-start text-secondary">Chat With Your AIA 💬</h2>
+            <div class="chat-container" id="chatConversation">
+                <p>Hi there! I am a large language model that can communicate and generate human-like text</p>
+            </div>
+            <hr>
+            <div class="input-group mt-3">
+                <input
+                        type="text"
+                        class="form-control"
+                        placeholder="Type your question here..."
+                        id="userInput"
+                        onkeypress="handleKeyPress(event)">
+                <button
+                        class="btn btn-primary"
+                        onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/static/script.js"></script>
+</body>
+</html>

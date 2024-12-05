@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: Chatbot App
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/chatbot
+    username: postgres
+    password: 1234
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+
+    hibernate:
+      ddl-auto: update  # use 'update' in development, 'validate' or 'none' in production
+
+# Secret key for jwt
+JWT_SECRET_KEY:
+  AB(G+KbPeShVkYp3s6v9y$B&E)H@McQf
+
+#port config
+server:
+  port: 7090

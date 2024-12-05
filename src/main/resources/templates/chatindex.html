@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Index</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+        background-image: url("/static/gemini0.png");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }
+    .table-container {
+        max-width: 80%;
+        margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+<div class="container mt-5">
+  <h1 class="text-center">Welcome to the Chat App</h1>
+  <div class="d-flex justify-content-center mt-4">
+    <!-- Button to start a new session -->
+    <button class="btn btn-primary mx-2" id="newSessionBtn">Start New Session</button>
+  </div>
+
+  <!-- Chat History Table -->
+  <div class="table-container mt-5">
+    <h3>Chat History</h3>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Session Name</th>
+          <th>Start Time</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="chatHistoryTableBody">
+        <!-- Dynamic content will be inserted here -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  // Get the access token from localStorage
+  const accessToken = localStorage.getItem('access_token');
+  const chatHistoryTableBody = document.getElementById('chatHistoryTableBody');
+
+  // Fetch chat history from the backend
+  async function fetchChatHistory() {
+    if (!accessToken) {
+      alert('You must be logged in to view the chat history.');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:7090/api/v1/chat/sessions', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const sessions = data.data;
+    
+        // Clear existing table rows
+        chatHistoryTableBody.innerHTML = '';
+    
+        // Populate the table with chat sessions
+        sessions.forEach(session => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${session.sessionName}</td>
+                <td>${new Date(session.updatedAt).toLocaleString()}</td>
+                <td>
+                    <a href="dummychatroom.html?sessionID=${session.id}&sessionName=${encodeURIComponent(session.sessionName)}"
+                        class="btn btn-info btn-sm">
+                        Open Chat
+                    </a>
+                </td>`;
+            chatHistoryTableBody.appendChild(row);
+        });
+    } else {
+        const error = await response.json();
+        alert('Error fetching chat sessions: ' + error.message);
+    }
+    
+    } catch (error) {
+      alert('An error occurred while fetching chat history: ' + error.message);
+    }
+  }
+
+  // Create a new chat session
+  async function startNewChatSession() {
+    if (!accessToken) {
+      alert('You must be logged in to start a new chat session.');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:7090/api/v1/chat/sessions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        alert('New chat session started successfully!');
+        window.location.href = `dummychatroom.html?sessionName=${encodeURIComponent(data.data.sessionName)}&sessionID=${data.data.id}`;
+      } else {
+        const error = await response.json();
+        alert('Error starting new chat session: ' + error.message);
+      }
+    } catch (error) {
+      alert('An error occurred while starting a new chat session: ' + error.message);
+    }
+  }
+
+  // Attach event listeners
+  document.getElementById('newSessionBtn').addEventListener('click', startNewChatSession);
+  // Fetch chat history when the page loads
+  alert(accessToken);
+  window.onload = fetchChatHistory;
+</script>
+
+</body>
+</html>

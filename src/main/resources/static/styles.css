@@ -1,0 +1,153 @@
+body {
+    background-color: #000000;
+}
+
+.welcome-container {
+    max-width: 600px;
+    margin: 100px auto;
+    padding: 40px;
+    background-color: rgba(255, 255, 255, 0.3); /* Semi-transparent white */
+    border-radius: 15px;
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+
+.welcome-container:hover {
+    transform: scale(1.05);
+    box-shadow: 0 25px 35px rgba(0, 0, 0, 0.1);
+}
+
+.welcome-container h1 {
+    font-size: 36px;
+    font-weight: 700;
+    color: #3e3e3e;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: color 0.3s ease-in-out;
+}
+
+.welcome-container h1:hover {
+    color: #6e7dff;
+}
+
+.welcome-container p {
+    font-size: 18px;
+    color: #777;
+    margin-bottom: 40px;
+    font-weight: 400;
+}
+
+.welcome-container .btn {
+    padding: 12px 30px;
+    font-size: 18px;
+    font-weight: 600;
+    text-transform: uppercase;
+    border-radius: 30px;
+    transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.welcome-container .btn-primary {
+    background-color: #6e7dff;
+    border: none;
+}
+
+.welcome-container .btn-primary:hover {
+    background-color: #5a6aff;
+    transform: translateY(-2px);
+}
+
+.welcome-container .btn-secondary {
+    background-color: #6c757d;
+    border: none;
+}
+
+.welcome-container .btn-secondary:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+}
+
+.welcome-container .d-flex {
+    justify-content: center;
+    gap: 20px;
+}
+
+
+.chat-container {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.818);
+    border: 1px solid #000000;
+    border-radius: 8px;
+}
+
+.chat-message {
+    white-space: pre-wrap;
+    margin-bottom: 15px;
+}
+
+.chat-message.user {
+    text-align: right;
+    color: rgb(243, 243, 244);
+}
+
+.chat-message.aia {
+    text-align: left;
+    color: #ffffff;
+}
+
+.sidebar {
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+/* Example custom styles */
+#sidebar {
+    transition: width 0.3s ease;
+}
+
+.collapse {
+    display: none;
+}
+
+#sidebarWrapper {
+    transition: width 0.3s ease;
+    overflow: hidden;
+}
+
+#sidebarWrapper.collapsed {
+    width: 0;
+    padding: 0;
+}
+
+#sidebarWrapper.collapsed .sidebar,
+#sidebarWrapper.collapsed button {
+    display: none;
+}
+
+.expand-tab {
+    cursor: pointer;  /* Change the cursor to a pointer on hover */
+}
+
+.expand-tab:hover {
+    color: #df0f19; /* Bootstrap primary color on hover */
+}
+
+h2 {
+    margin-bottom: 20px;
+    color: #343a40; /* Dark gray */
+}
+
+
+
+a {
+    text-decoration: none;
+    color: #007bff; /* Bootstrap primary color */
+}
+
+a:hover {
+    text-decoration: underline;
+}

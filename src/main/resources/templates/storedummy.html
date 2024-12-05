@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Room</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-image: url("/static/gemini0.png");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .chat-container {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+            width: 80%;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        #messagesContainer {
+            max-height: 500px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #fafafa;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            word-wrap: break-word;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .alert-secondary {
+            background-color: #f1f1f1;
+            color: #333;
+        }
+        
+        .alert-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        .message-user {
+            text-align: left;
+        }
+        
+        .message-bot {
+            text-align: right;
+        }
+        
+        .input-group {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .input-group input {
+            width: 80%;
+        }
+        
+        .input-group button {
+            width: 18%;
+        }
+        
+        /* Smooth fade-in for new messages */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        .message {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+    </style>
+</head>
+<body>
+<div class="container chat-container mt-5 d-flex">
+    <!-- Sidebar with other chat histories -->
+    <div class="sidebar" id="chatHistory">
+        <h3>Other Chats</h3>
+        <div id="chatList"></div>
+        <button class="collapse-sidebar-btn" id="collapseSidebarBtn">Close</button>
+    </div>
+
+    <!-- Main Chat Area -->
+    <div class="flex-fill">
+        <h1 class="text-center mb-4" id="sessionName">Chat Room</h1>
+        <div id="messagesContainer"></div>
+        <div class="input-group mt-3">
+            <input type="text" id="messageInput" class="form-control" placeholder="Type a message" aria-label="Message Input">
+            <button class="btn btn-primary" id="sendMessageBtn">Send</button>
+        </div>
+    </div>
+
+    <!-- Button to open the sidebar -->
+    <button class="open-sidebar-btn" id="openSidebarBtn">Open History</button>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const sessionName = urlParams.get('sessionName'); // Retrieves sessionName from URL
+  const sessionID = urlParams.get('sessionID'); // Retrieves sessionID from URL
+
+  const accessToken = localStorage.getItem('access_token');
+  const sessionNameElement = document.getElementById('sessionName');
+  const messagesContainer = document.getElementById('messagesContainer');
+  const messageInput = document.getElementById('messageInput');
+  const chatHistory = document.getElementById('chatHistory');
+  const chatList = document.getElementById('chatList');
+  const openSidebarBtn = document.getElementById('openSidebarBtn');
+  const collapseSidebarBtn = document.getElementById('collapseSidebarBtn');
+
+  console.log('sessionID:', sessionID);
+
+  // Fetch messages for the current session
+  async function fetchMessages() {
+      if (!accessToken || !sessionName) {
+          alert('Session not found or you are not logged in.');
+          return;
+      }
+  
+      // Show alert while fetching messages
+      const fetchingAlert = document.createElement('div');
+      fetchingAlert.classList.add('alert', 'alert-info');
+      fetchingAlert.textContent = 'Wait until history is fetched...';
+      messagesContainer.innerHTML = ''; // Clear previous messages
+      messagesContainer.appendChild(fetchingAlert);
+  
+      try {
+          const response = await fetch(`http://localhost:7090/api/v1/chat/sessions/${sessionID}/messages`, {
+              method: 'GET',
+              headers: {
+                  'Authorization': `Bearer ${accessToken}`,
+                  'Content-Type': 'application/json',
+              },
+          });
+  
+          if (response.ok) {
+            console.log(response); // Logs the entire response object
+
+              const data = await response.json();
+              const messages = data.data ; // Ensure `messages` is an array
+              messagesContainer.innerHTML = ''; // Clear fetching alert
+  
+              // Display the session name
+              sessionNameElement.textContent = `Chat Room - ${sessionName}`;
+  
+              // Display all messages in the chat
+              if (messages.length > 0) {
+                  messages.forEach(message => {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.classList.add('alert', 'alert-secondary', 'message');
+                    messageDiv.innerHTML = `
+                        <strong>User:</strong> ${message.userRequest}<br>
+                        <strong>Bot:</strong> ${message.botResponse}<br>
+                    `;
+                  messagesContainer.appendChild(messageDiv);
+                  });
+              } else {
+                messagesContainer.innerHTML = '<div class="alert alert-info">No messages available.</div>';
+              }
+  
+              // Fetch other chat histories for the sidebar
+              fetchChatHistories();
+  
+          } else {
+              const error = await response.json();
+              alert('Error fetching messages: ' + error.message);
+          }
+      } catch (error) {
+          alert('An error occurred while fetching messages: ' + error.message);
+      }
+  }
+
+  // Fetch other chat histories and display in the sidebar
+  async function fetchChatHistories() {
+      try {
+          const response = await fetch(`http://localhost:7090/api/v1/chat/sessions`, {
+              method: 'GET',
+              headers: {
+                  'Authorization': `Bearer ${accessToken}`,
+                  'Content-Type': 'application/json',
+              },
+          });
+
+          if (response.ok) {
+              const data = await response.json();
+              const sessions = data.data;
+
+              chatList.innerHTML = '';
+              sessions.forEach(session => {
+                  const sessionDiv = document.createElement('div');
+                  sessionDiv.innerHTML = `
+                      <a href="dummychatroom.html?sessionID=${session.id}&sessionName=${encodeURIComponent(session.sessionName)}" 
+                         class="btn btn-info btn-sm" 
+                         onclick="localStorage.setItem('sessionID', ${session.id}); 
+                                  localStorage.setItem('sessionName', '${session.sessionName}');">
+                         ${session.sessionName}
+                      </a>
+                  `;
+                  chatList.appendChild(sessionDiv);
+              });
+          } else {
+              const error = await response.json();
+              alert('Error fetching chat histories: ' + error.message);
+          }
+      } catch (error) {
+          alert('An error occurred while fetching chat histories: ' + error.message);
+      }
+  }
+
+// Send a new message
+async function sendMessage() {
+    const messageText = messageInput.value.trim();
+    if (!messageText) return;
+
+    // Display the user's message
+    const userMessageDiv = document.createElement('div');
+    userMessageDiv.classList.add('alert', 'alert-secondary', 'message', 'message-user');
+    userMessageDiv.innerHTML = `<strong>User:</strong> ${messageText}`;
+    messagesContainer.appendChild(userMessageDiv);
+    messageInput.value = ''; // Clear input field
+
+    // Scroll to the bottom to show the newest message
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+    try {
+        const response = await fetch('http://localhost:7090/api/v1/chat/sessions/ask-question', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ sessionId: sessionID, userQuestion: messageText }),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            const botResponse = data.data.botResponse;
+
+            // Display the bot's response as a typing stream
+            const botMessageDiv = document.createElement('div');
+            botMessageDiv.classList.add('alert', 'alert-primary', 'message', 'message-bot');
+            botMessageDiv.innerHTML = `<strong>Bot:</strong> <span id="typing"></span>`;
+            messagesContainer.appendChild(botMessageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // Stream the bot's response character by character
+            typeBotMessage(botResponse, botMessageDiv.querySelector('#typing'));
+        } else {
+            const error = await response.json();
+            alert('Error sending message: ' + error.message);
+        }
+    } catch (error) {
+        alert('An error occurred while sending the message: ' + error.message);
+    }
+}
+
+// Function to simulate typing the bot's response
+function typeBotMessage(message, element) {
+    let index = 0;
+    const typingInterval = setInterval(() => {
+        if (index < message.length) {
+            element.innerHTML += message.charAt(index);
+            index++;
+        } else {
+            clearInterval(typingInterval); // Stop typing when the message is complete
+        }
+    }, 5); // Adjust typing speed by changing the interval (ms)
+}
+
+
+
+  // Add event listener to the "Send" button
+  document.getElementById('sendMessageBtn').addEventListener('click', sendMessage);
+
+  // Optionally, add an event listener to send the message when "Enter" is pressed
+  messageInput.addEventListener('keydown', function(event) {
+      if (event.key === 'Enter') {
+          sendMessage();
+      }
+  });
+
+
+  // Open/close the sidebar
+  openSidebarBtn.addEventListener('click', function() {
+      chatHistory.classList.toggle('show');
+  });
+
+  // Close the sidebar
+  collapseSidebarBtn.addEventListener('click', function() {
+      chatHistory.classList.remove('show');
+  });
+
+  // Fetch messages when the page loads
+  window.onload = fetchMessages;
+</script>
+</body>
+</html>

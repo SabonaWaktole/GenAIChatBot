@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-image: url("/static/gemini0.png");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .signup-container {
+            max-width: 400px;
+            margin: auto;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.85); /* Semi-transparent white background */
+            border-radius: 15px;
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        h2 {
+            text-align: center;
+            color: #2d2d2d;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+        }
+
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 16px;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .text-center a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .text-center a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .error {
+            color: red;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+    <div class="signup-container">
+        <h2>Signup</h2>
+        <form id="signupForm">
+            <div class="mb-3">
+                <label for="signupFullName" class="form-label">Full Name</label>
+                <input type="text" class="form-control" id="signupFullName" placeholder="Enter your full name" required>
+                <div class="error" id="fullNameError"></div>
+            </div>
+            <div class="mb-3">
+                <label for="signupUsername" class="form-label">email</label>
+                <input type="email" class="form-control" id="signupUsername" placeholder="Enter your email" required>
+                <div class="error" id="usernameError"></div>
+            </div>
+            <div class="mb-3">
+                <label for="signupPassword" class="form-label">Password</label>
+                <input type="password" class="form-control" id="signupPassword" placeholder="Enter a secure password" required>
+                <div class="error" id="passwordError"></div>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Signup</button>
+        </form>
+        <div class="text-center mt-3">
+            <p>Already have an account? <a href="login.html" class="text-primary">Login</a></p>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Custom JS -->
+<script src="/static/script.js"></script>
+
+<script>
+    document.getElementById('signupForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        // Clear any previous error messages
+        document.getElementById('fullNameError').textContent = '';
+        document.getElementById('usernameError').textContent = '';
+        document.getElementById('passwordError').textContent = '';
+
+        let isValid = true;
+
+        // Gather form data
+        const fullName = document.getElementById('signupFullName').value;
+        const username = document.getElementById('signupUsername').value;
+        const password = document.getElementById('signupPassword').value;
+
+        // Validation checks
+        if (!fullName) {
+            document.getElementById('fullNameError').textContent = 'Full name is required and must not be empty';
+            isValid = false;
+        }
+
+        if (!username) {
+            document.getElementById('usernameError').textContent = 'email is required and must not be empty';
+            isValid = false;
+        }
+
+        if (!password) {
+            document.getElementById('passwordError').textContent = 'Password is required and must not be empty';
+            isValid = false;
+        }
+
+        // If form is valid, proceed with AJAX request
+        if (isValid) {
+            const formData = {
+                fullName: fullName,
+                username: username,
+                password: password
+            };
+
+            fetch('http://localhost:7090/api/v1/users/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData) // Convert form data to JSON
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message == "User registered successfully"){
+                    alert("Succes:" + data.message);
+                    window.location.href = "/Chatbot/templates/login.html";
+                    
+                }else {
+                    alert('Error: ' + data.message); // Handle errors if any
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while processing your request.');
+            });
+        }
+    });
+</script>
+</body>
+</html>
