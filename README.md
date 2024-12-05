@@ -2,3 +2,11 @@
 "# Advanced-Chat-bot" 
 # Advanced-Chat-bot
 # GenAIChatBot
+Development
+Backend
+Framework: Spring Boot
+Database: PostgreSQL
+Build Tool: Maven
+Frontend
+Design: HTML and Bootstrap
+Interactivity: JavaScript
