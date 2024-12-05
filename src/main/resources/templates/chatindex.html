@@ -119,7 +119,7 @@
       if (response.ok) {
         const data = await response.json();
         alert('New chat session started successfully!');
-        window.location.href = `dummychatroom.html?sessionName=${encodeURIComponent(data.data.sessionName)}&sessionID=${data.data.id}`;
+        window.location.href = `chatroom.html?sessionName=${encodeURIComponent(data.data.sessionName)}&sessionID=${data.data.id}`;
       } else {
         const error = await response.json();
         alert('Error starting new chat session: ' + error.message);
