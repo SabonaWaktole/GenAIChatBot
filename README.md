@@ -68,12 +68,6 @@ SPRING_DATASOURCE_PASSWORD=your_password
 
 ---
 
-## 📸 Demo Screenshot (Optional)
-
-*Add a screenshot or GIF of your chatbot in action*
-
----
-
 ## 📌 Roadmap
 
 * [ ] Add user authentication
